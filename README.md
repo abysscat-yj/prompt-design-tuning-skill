@@ -2,48 +2,111 @@
 
 ### Turn prompt tuning from guesswork into engineering.
 
-> A Claude Code Skill that transforms prompt optimization into a **structured, repeatable, cost-controlled** workflow — where agents do the heavy lifting and humans stay in control at the gates that matter.
+---
+
+## Without This Skill vs. With This Skill
+
+<table>
+<tr>
+<th width="50%"> Without Skill — Agent "Freestyle" </th>
+<th width="50%"> With Skill — Structured Workflow </th>
+</tr>
+<tr>
+<td>
+
+You say "help me optimize this prompt"
+
+Agent rewrites the whole prompt on vibes
+
+You eyeball a few outputs: "looks okay I guess"
+
+Agent tweaks again... and again... and again...
+
+You lose track of what changed and why
+
+Something breaks in production — no one knows which edit caused it
+
+**Result: hours burned, no confidence, no reproducibility**
+
+</td>
+<td>
+
+You say "help me optimize this prompt"
+
+Agent freezes a task spec first, asks you to confirm (Gate A)
+
+Agent writes target prompt + separate judge prompt (Gates B & C)
+
+Agent runs batch evaluation with metrics, logs every change
+
+Each iteration has a hypothesis, a diff, and a score delta
+
+Final candidate comes with a full report — you approve or reject (Gate E)
+
+**Result: versioned, measurable, auditable, ready for production**
+
+</td>
+</tr>
+</table>
 
 ---
 
-## The Problem
+## What Makes This Skill Different
 
-Most prompt tuning looks like this: tweak a sentence, eyeball the output, repeat until it "feels right." No versioning, no metrics, no reproducibility. When it breaks in production, nobody knows which change caused it.
+| Dimension | Bare Agent | + This Skill |
+|-----------|-----------|--------------|
+| **Process** | Chat-style back-and-forth | 8-phase pipeline with 5 human gates |
+| **Evaluation** | "Looks good to me" | Independent judge prompt + structured scoring |
+| **Iteration** | Random tweaks | Hypothesis-driven, with diff and predicted impact |
+| **Tracking** | Scroll up in chat history | Experiment log with version, metrics, cost per round |
+| **Cost** | Unknown spend, no budget | TPM/RPM-aware, max 2 high-cost rounds by default |
+| **Failure analysis** | "It sometimes gets it wrong" | 11-category failure taxonomy with cluster detection |
+| **Deliverables** | A prompt in a chat message | 9 production artifacts: specs, prompts, scripts, reports |
+| **Confidence** | "The agent said it's good" | Metrics-backed recommendation with known failure modes |
 
-## The Solution
+---
 
-This skill enforces an **engineering-grade prompt development lifecycle**:
+## The Workflow
 
 ```
-Task Spec --> Target Prompt --> Judge Prompt --> Eval Plan --> Generate --> Evaluate --> Iterate --> Ship
-    |              |                |               |                                    |         |
-  Gate A         Gate B           Gate C          Gate D                                Gate D   Gate E
-  (human)        (human)          (human)         (human)                               (human)  (human)
+Phase 0        Phase 1          Phase 2          Phase 3
+Task Spec  -->  Target Prompt -->  Judge Prompt -->  Eval Plan
+   |               |                  |                |
+ Gate A          Gate B             Gate C             |
+ confirm         confirm            confirm            |
+ task def        direction          fairness           v
+                                                 Phase 4-6
+                                              Generate + Evaluate
+                                                       |
+                                                     Gate D
+                                                  approve budget
+                                                       |
+                                                    Phase 7
+                                                 Analyze + Iterate
+                                                       |
+                                                    Phase 8
+                                              Final Recommendation
+                                                       |
+                                                     Gate E
+                                                  launch review
 ```
 
-**The agent executes.** You only approve at the checkpoints.
+**You approve at the gates. The agent handles everything in between.**
 
 ---
 
 ## Key Features
 
-**Separation of Concerns** — Target prompt and judge prompt are developed independently. No mixing gains.
-
-**Hypothesis-Driven Iteration** — Every optimization round starts with a clear hypothesis. No "let's just tweak it and see."
-
-**Experiment Logging** — Every round records: version, changes, hypothesis, metrics, cost, and conclusion.
-
-**Cost Control** — Default max 2 high-cost rounds. Budget-aware. Early stopping when gains plateau.
-
-**Failure Taxonomy** — Systematic classification: task misunderstanding, reasoning errors, hallucinations, format issues, and more.
-
-**Two Working Modes** — *Design-only* (no API needed) or *Execution* (end-to-end automation with real model calls).
+- **Separation of Concerns** — Target prompt and judge prompt are developed and versioned independently. No mixing gains.
+- **Hypothesis-Driven** — Every round states what it expects to improve and what might regress. No "let's just try."
+- **Full Experiment Log** — Version, changes, hypothesis, metrics, cost, and conclusion — every round, automatically.
+- **Budget Guard** — Max 2 high-cost rounds by default. Early stopping when gains plateau. Human approval before spending.
+- **Failure Taxonomy** — 11 categories: task misunderstanding, reasoning errors, hallucinations, format issues, constraint violations, and more.
+- **Two Modes** — *Design-only* (no API needed, outputs drafts and plans) or *Execution* (end-to-end with real model calls).
 
 ---
 
 ## Deliverables
-
-The skill produces a complete artifact set:
 
 | Category | Files |
 |----------|-------|
@@ -54,31 +117,15 @@ The skill produces a complete artifact set:
 
 ---
 
-## Human Gates
-
-You stay in control at 5 key checkpoints:
-
-| Gate | Purpose |
-|------|---------|
-| **A** | Freeze the task definition |
-| **B** | Approve target prompt direction |
-| **C** | Approve judge prompt direction |
-| **D** | Authorize high-cost iteration loops |
-| **E** | Final launch review |
-
-Between gates, the agent runs autonomously.
-
----
-
 ## Quick Start
 
-### Install the Skill
+### Install
 
 ```bash
 claude skill install abysscat-yj/prompt-design-tuning-skill
 ```
 
-### Trigger It
+### Trigger
 
 Say any of these to Claude Code:
 
@@ -87,18 +134,6 @@ Say any of these to Claude Code:
 - *"Find the best prompt across these models within my budget"*
 - *"Run 1-2 prompt iteration rounds with cost control"*
 - *"Automate this prompt tuning workflow"*
-
----
-
-## Anti-Patterns (What This Skill Prevents)
-
-- Changing both target and judge prompts in the same round without disclosure
-- Looking only at aggregate scores while ignoring failure distributions
-- Overfitting to tiny eval sets without warning
-- Substituting machine evaluation for final human review
-- Endless looping over marginal score improvements
-- Full rewrites when only one section is broken
-- Declaring success without showing hard examples
 
 ---
 
@@ -114,48 +149,110 @@ MIT
 
 ### 把 prompt 调优从玄学变成工程。
 
-> 一个 Claude Code Skill，将 prompt 优化变成**可执行、可复盘、可控成本**的工程流程 —— Agent 负责执行，人类只在关键节点把关。
+---
+
+## 没有这个 Skill vs. 有这个 Skill
+
+<table>
+<tr>
+<th width="50%"> 没有 Skill — Agent "自由发挥" </th>
+<th width="50%"> 有 Skill — 结构化工程流程 </th>
+</tr>
+<tr>
+<td>
+
+你说："帮我优化一下这个 prompt"
+
+Agent 凭感觉把整个 prompt 重写一遍
+
+你肉眼看几条输出："好像还行吧"
+
+Agent 继续改……再改……再改……
+
+你已经记不清改了什么、为什么改
+
+线上出了问题——没人说得清是哪次改动炸的
+
+**结果：花了几个小时，没信心，不可复现**
+
+</td>
+<td>
+
+你说："帮我优化一下这个 prompt"
+
+Agent 先冻结任务定义，请你确认（Gate A）
+
+Agent 分别写目标 prompt 和独立的机评 prompt（Gate B & C）
+
+Agent 跑批量评估，每轮改动有指标、有日志
+
+每一轮迭代有假设、有 diff、有分数变化
+
+最终候选版附带完整报告——你审批上线或打回（Gate E）
+
+**结果：有版本、有指标、可审计、可上线**
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 痛点
+## 到底强在哪
 
-大多数 prompt 调优是这样的：改一句话，肉眼看看输出，感觉差不多就上线。没有版本管理，没有指标追踪，没有可复现性。线上出了问题，谁也说不清是哪次改动导致的。
+| 维度 | 裸 Agent | + 这个 Skill |
+|------|---------|-------------|
+| **流程** | 聊天式来回对话 | 8 阶段流水线 + 5 个人类闸门 |
+| **评估** | "我看着还行" | 独立机评 prompt + 结构化打分 |
+| **迭代** | 随缘修改 | 假设驱动，有 diff，有预期影响 |
+| **追踪** | 翻聊天记录 | 实验日志：每轮版本、指标、成本 |
+| **成本** | 花了多少不知道 | TPM/RPM 感知，默认最多 2 轮高成本迭代 |
+| **失败分析** | "有时候会出错" | 11 类失败分类 + 自动聚类 |
+| **交付物** | 聊天框里一段 prompt | 9 份工程制品：规格、prompt、脚本、报告 |
+| **上线信心** | "Agent 说效果不错" | 有指标支撑的推荐 + 已知失败模式 |
 
-## 解决方案
+---
 
-这个 Skill 强制执行一套**工程级 prompt 开发流程**：
+## 工作流程
 
 ```
-任务定义 --> 目标Prompt --> 机评Prompt --> 评估方案 --> 批量生成 --> 机器评估 --> 迭代优化 --> 上线
-   |            |              |            |                                   |          |
- Gate A       Gate B         Gate C       Gate D                              Gate D     Gate E
- (人工确认)    (人工确认)      (人工确认)    (人工确认)                           (人工确认)   (人工确认)
+Phase 0          Phase 1            Phase 2            Phase 3
+任务定义    -->   目标 Prompt   -->   机评 Prompt   -->   评估方案
+  |                 |                   |                  |
+Gate A            Gate B              Gate C               |
+确认               确认                确认                 v
+任务理解            方向正确            评估公平          Phase 4-6
+                                                     生成 + 评估
+                                                          |
+                                                        Gate D
+                                                      批准预算
+                                                          |
+                                                       Phase 7
+                                                     分析 + 迭代
+                                                          |
+                                                       Phase 8
+                                                      最终推荐
+                                                          |
+                                                        Gate E
+                                                      上线验收
 ```
 
-**Agent 负责执行，你只需要在关键检查点批准。**
+**你在闸门处把关，其余全部由 Agent 自动执行。**
 
 ---
 
 ## 核心特性
 
-**关注点分离** — 目标 prompt 和机评 prompt 独立开发，收益不混淆。
-
-**假设驱动迭代** — 每一轮优化都必须有明确假设，杜绝"改改试试"。
-
-**实验记录** — 每轮记录：版本号、改动内容、优化假设、指标结果、成本、结论。
-
-**成本控制** — 默认最多 2 轮高成本优化，预算感知，收益平台期自动停止。
-
-**失败分类体系** — 系统化归类：任务理解错误、推理错误、幻觉、格式问题等。
-
-**双工作模式** — *仅设计模式*（无需 API）或 *执行模式*（端到端自动化，真实调用模型）。
+- **关注点分离** — 目标 prompt 和机评 prompt 独立开发、独立版本管理，收益不混淆。
+- **假设驱动** — 每轮必须声明预期改善什么、可能退化什么，杜绝"改改试试"。
+- **完整实验日志** — 版本号、改动内容、假设、指标、成本、结论——每一轮自动记录。
+- **预算守卫** — 默认最多 2 轮高成本优化，收益平台期自动停止，花钱前必须人工批准。
+- **失败分类体系** — 11 大类：任务理解错误、推理错误、幻觉、格式问题、约束违反等。
+- **双模式** — *仅设计模式*（无需 API，输出草案和方案）或 *执行模式*（端到端真实调用模型）。
 
 ---
 
 ## 产出物
-
-Skill 产出一套完整的工程制品：
 
 | 类别 | 文件 |
 |------|------|
@@ -166,25 +263,9 @@ Skill 产出一套完整的工程制品：
 
 ---
 
-## 人类闸门
-
-你在 5 个关键检查点保持控制权：
-
-| 闸门 | 用途 |
-|------|------|
-| **A** | 冻结任务定义 |
-| **B** | 确认目标 prompt 方向 |
-| **C** | 确认机评 prompt 方向 |
-| **D** | 批准高成本迭代循环 |
-| **E** | 最终上线验收 |
-
-闸门之间，Agent 全自动执行。
-
----
-
 ## 快速开始
 
-### 安装 Skill
+### 安装
 
 ```bash
 claude skill install abysscat-yj/prompt-design-tuning-skill
@@ -199,18 +280,6 @@ claude skill install abysscat-yj/prompt-design-tuning-skill
 - *"根据评估集和几个模型，找出当前最优 prompt"*
 - *"控制预算做 1-2 轮 prompt 迭代"*
 - *"让 agent 自动推进，人只在关键节点确认"*
-
----
-
-## 反模式（这个 Skill 帮你避免的坑）
-
-- 同一轮既改目标 prompt 又改机评 prompt，却不说明
-- 只看总分，不看失败分布
-- 在超小评估集上过拟合，却不提醒风险
-- 用机评替代人工最终验收
-- 分数微小波动就无限循环
-- 一个点坏了就把整个 prompt 全部重写
-- 没展示硬例子就宣布"效果很好"
 
 ---
 
